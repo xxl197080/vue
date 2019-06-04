@@ -1,0 +1,71 @@
+# 项目的目录结构
+
+- public           静态资源文件夹，里面的内容是不需要 webpack 做打包的
+  - favicon.ico       小图标
+  - index.html        用于 webpack 主动生成 index.html 的模板
+
+- src              项目的源文件，写代码的位置。这里面所有的内容，都会经过 webpack 的打包构建
+  - assets           静态资源文件夹，这里面主要放 css img font 之类的东西
+  - components       vue 的组件
+  - app.vue          vue的老二组件
+  - main.js          项目的入口js文件
+
+- .browserslistrc   浏览器的兼容配置文件，他主要是给到 postcss 使用的
+- .editorconfig     告诉我们编辑器的配置
+- .eslintrc.js      eslint 的规则配置文件
+- .gitignore        git 忽略文件
+- babel.config.js   babel 的配置文件，.babelrc
+- package-lock.json npm 锁文件
+- package.json      npm 依赖项，与当前项目的描述
+- postcss.config.js postcss 的配置文件
+- README.md         说明文件
+
+# 启动项目
+
+## 假数据 - 使用 json-server 来模拟假数据
+
+### 1、自己写 json 文件
+
+> 假数据文件应该放在public文件夹中，因为 npm run serve 是在内存中的dist文件里运行的，是以dist文件夹作为根目录运行，
+  而public文件夹的文件会复制到dist文件中。
+
+### 2、mockjs
+
+> 一款能够创建假数据，并且这个数据还有些真实性，主要实现返回随机数据。它主要是拦截我们的ajax请求实现。
+1、安装
+```sh
+npm install --save mockjs
+```
+2、去编写 mockjs 的拦截代码
+```js
+import Mock from 'mockjs';
+
+Mock.mock(/todos.json/, {
+  'code': 0,
+  'msg': function () {
+    return this.code === 0 ? 'ok' : '网络异常'
+  },
+  'data|10-20': [
+    {
+      'name': '@cname',
+      'id|+1': 1
+    }
+  ]
+})
+// mock 文件不需要暴露出去，哪里要用只需要引入这个文件
+```
+3、哪里需要用到这个就引入第二步中的文件，在main.js中引入也可以，因为main.js是打包入口文件
+
+### 3、使用json-server
+> 也是一套假数据的工具，但是能帮助我们是想数据的操作，更能模拟真实的数据库。
+1、全局安装
+``` js
+npm install -g json-server
+```
+2、写一个json文件
+3、启动json-server
+```js
+json-server --watch db.json //db.json是文件坐在的位置
+```
+
+
