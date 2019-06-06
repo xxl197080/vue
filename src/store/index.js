@@ -1,41 +1,105 @@
-// 1、引入 vue
 import Vue from 'vue';
-// 2、引入 vuex
 import Vuex from 'vuex';
-// 3、调用 Vuex
+
 Vue.use(Vuex);
-// 4.创建仓库的实例对象
-const store = new Vuex.Store({
-  // 仓库的选项对象
 
-  // state是数据或状态
-  state: {
-    title: 'hello-world'
-  },
-  // getters是针对state的二次计算后的数据，相当于computed
-  getters: {
-    // key - getter的名字，value - 值，是函数形式的，return
-    // getters 函数能接收到state，也就是上面的state
-    firstTitle (state) {
-      return state.title.split('-')[0]
-    },
-    lastTitle (state) {
-      return state.title.split('-')[1]
-    },
-  },
+const state = {
+  inputVal: '睡觉',
+  todos: []
+}
 
-  mutations: {
-    // key - mutation 的名字
-    // value - 函数 接收到的 state
-    changeTit (state,payload) {
-      // setTimeout(() => {
-      state.title = payload.name
-      // }, 2000);
+const getters = {
+
+}
+
+const mutations = {
+  changeVal (state,payload) {
+    state.inputVal = payload;
+  },
+  initTodos (state,todos) {
+    state.todos = todos;
+  },
+  addTodo (state) {
+    let todo = {
+      id: state.todos.length + 1,
+      name: state.inputVal
     }
+    state.todos.push(todo);
   },
-  actions: {
+  delTodo (state,payload) {
+    // let index = payload.index;
+    // state.todos.splice(index,1);
 
+    //通过id查找下标删除
+    let index = state.todos.findIndex(item => item.id === payload);
+    console.log(index)
+    state.todos.splice(index,1);
   }
+}
+
+const actions = {
+  // context可以理解为 this.$store
+  // add ({ state,commit }){   //解构写法
+  add (context) {
+    fetch('http://localhost:3000/todos',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name: context.state.inputVal })
+    })
+      .then(response => response.json())
+      .then(res => {
+        console.log(res);
+        // 请求成功之后再去修改仓库
+        // this.addTodo();
+        context.commit({
+          type: 'addTodo'
+        })
+      })
+  },
+
+  /**
+   * 初始化的todos数据
+   */
+  initTodos ({ commit }) {
+    fetch('http://localhost:3000/todos')
+      .then(response => response.json())
+      .then(res => {
+        console.log(res)
+        commit('initTodos',res)
+      })
+  },
+  /**
+   * 删除某条todo
+   * @param {Object} todo 当前需要删除的todo的对象
+   */
+  delTodo ({ commit, state },todo) {
+    // 0、先把仓库中todos备份
+    // let newTodos = state.todos;// 这样是引用类型,下面修改也会影响
+    let newTodos = [...state.todos];
+    // 1、先删除仓库中的todo
+    commit('delTodo',todo.id);
+    // 2、发请求厂库删除数据
+    fetch(`http://localhost:3000/todos/${todo.id}`,{
+      method: 'delete'
+    }).then(response => response.json())
+      .then(res => {
+        // 删除成功
+        // console.log(res)
+        alert('删除成功')
+      })
+      .catch(error => {
+        // 删除失败
+        console.log('删除失败')
+        commit('initTodos',newTodos)
+      })
+  }
+}
+
+export default new Vuex.Store({
+  state,
+  getters,
+  mutations,
+  actions
 })
-// 5、暴露 store
-export default store;
