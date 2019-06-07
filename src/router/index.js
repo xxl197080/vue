@@ -10,6 +10,10 @@ export default new VueRouter({
       component: () => import('../views/Todo.vue')
     },
     {
+      path: '/cart',
+      component: () => import('../views/Cart.vue')
+    },
+    {
       path: '*',
       redirect: '/todo'
     }

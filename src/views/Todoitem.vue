@@ -15,7 +15,7 @@ export default {
   },
   methods: {
     // ...mapMutations(['delTodo'])
-    ...mapActions(['delTodo'])
+    ...mapActions('todo',['delTodo'])
   }
 }
 </script>
