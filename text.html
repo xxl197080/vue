@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <h1>测试history事件</h1>
+  <button id="btn">点击去page2</button>
+  <div id="box">
+    page1
+  </div>
+</body>
+
+<script>
+  let btn = document.getElementById('btn');
+  let box = document.getElementById('box');
+  btn.onclick = function (){
+    // history.pushState 第一个参数data，可以是任意类型的，传的是state数据，第二个参数是改变页面的title，第三个参数是url地址
+    history.pushState('page2','hello','page2');
+    box.innerHTML = "page2"
+  }
+  window.onpopstate = function (obj) {
+    console.log(obj);
+    if ( obj.state === 'page2' ){
+      box.innerHTML = "page2"
+    }else{
+      box.innerHTML = "page1"
+    }
+  }
+</script>
+</html>
